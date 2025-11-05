@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import axios from 'axios';
+import api from '@/utils/api'; // USE THE CONFIGURED API INSTANCE
 import { useRouter } from 'next/navigation';
 
 interface User {
@@ -37,15 +37,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setToken(storedToken);
       setUser(JSON.parse(storedUser));
       setIsAuthenticated(true);
-      // Set default authorization header
-      axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
     }
     setLoading(false);
   }, []);
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await axios.post('/api/auth/login', { email, password });
+      console.log('🔐 LOGIN: Calling API...');
+      const response = await api.post('/auth/login', { email, password });
       const { token: newToken, user: newUser } = response.data;
 
       setToken(newToken);
@@ -56,16 +55,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem('token', newToken);
       localStorage.setItem('user', JSON.stringify(newUser));
 
-      // Set default authorization header
-      axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
+      console.log('✅ LOGIN: Success!');
     } catch (error: any) {
+      console.error('❌ LOGIN: Failed', error);
       throw new Error(error.response?.data?.error || 'Login failed');
     }
   };
 
   const signup = async (name: string, email: string, password: string) => {
     try {
-      const response = await axios.post('/api/auth/signup', { name, email, password });
+      console.log('📝 SIGNUP: Calling API...');
+      const response = await api.post('/auth/signup', { name, email, password });
       const { token: newToken, user: newUser } = response.data;
 
       setToken(newToken);
@@ -76,9 +76,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem('token', newToken);
       localStorage.setItem('user', JSON.stringify(newUser));
 
-      // Set default authorization header
-      axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
+      console.log('✅ SIGNUP: Success!');
     } catch (error: any) {
+      console.error('❌ SIGNUP: Failed', error);
       throw new Error(error.response?.data?.error || 'Signup failed');
     }
   };
@@ -91,9 +91,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Clear localStorage
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-
-    // Remove authorization header
-    delete axios.defaults.headers.common['Authorization'];
   };
 
   return (

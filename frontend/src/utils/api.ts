@@ -1,13 +1,16 @@
 import axios from 'axios';
 
-// Force the environment variable to be inlined at build time
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
+// TEMPORARY HARDCODE: Force the backend URL
+const API_BASE_URL = 'https://slotswapper-backend-sx7f.onrender.com/api';
 
-console.log('🔧 API Base URL (build time):', API_BASE_URL);
-console.log('🔧 All env vars:', { 
-  NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
-  NODE_ENV: process.env.NODE_ENV 
-});
+// AGGRESSIVE LOGGING
+console.log('========================================');
+console.log('🔧🔧🔧 API.TS FILE LOADED 🔧🔧🔧');
+console.log('🔧 API Base URL:', API_BASE_URL);
+console.log('🔧 process.env.NEXT_PUBLIC_API_URL:', process.env.NEXT_PUBLIC_API_URL);
+console.log('🔧 NODE_ENV:', process.env.NODE_ENV);
+console.log('🔧 typeof window:', typeof window);
+console.log('========================================');
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -15,6 +18,8 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+console.log('✅ Axios instance created with baseURL:', api.defaults.baseURL);
 
 // Add request interceptor to include token AND log the full URL
 api.interceptors.request.use(
