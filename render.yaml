@@ -2,7 +2,6 @@ databases:
   - name: slotswapper-db
     plan: free
     databaseName: slotswapper
-    user: postgres
 
 services:
   # Backend API
