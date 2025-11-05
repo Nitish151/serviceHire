@@ -83,7 +83,21 @@ Frontend runs on: `http://localhost:3000`
 ```bash
 POST /api/auth/signup
 Body: { "name": "John", "email": "john@example.com", "password": "pass123" }
-Returns: { "token": "jwt-token", "user": {...} }
+Returns: { "token": "jwt-token", "user": { "id": "uuid", "name": "John", "email": "john@example.com" } }
+```
+
+**Login:**
+```bash
+POST /api/auth/login
+Body: { "email": "john@example.com", "password": "pass123" }
+Returns: { "token": "jwt-token", "user": { "id": "uuid", "name": "John", "email": "john@example.com" } }
+```
+
+**Get User's Events:**
+```bash
+GET /api/events
+Headers: { "Authorization": "Bearer <token>" }
+Returns: [{ "id": "uuid", "title": "Meeting", "startTime": "2025-11-10T10:00:00Z", "endTime": "2025-11-10T11:00:00Z", "status": "BUSY", "userId": "uuid" }]
 ```
 
 **Create Event:**
@@ -91,6 +105,55 @@ Returns: { "token": "jwt-token", "user": {...} }
 POST /api/events
 Headers: { "Authorization": "Bearer <token>" }
 Body: { "title": "Meeting", "startTime": "2025-11-10T10:00:00Z", "endTime": "2025-11-10T11:00:00Z", "status": "BUSY" }
+Returns: { "id": "uuid", "title": "Meeting", "startTime": "2025-11-10T10:00:00Z", "endTime": "2025-11-10T11:00:00Z", "status": "BUSY", "userId": "uuid" }
+```
+
+**Update Event:**
+```bash
+PUT /api/events/:id
+Headers: { "Authorization": "Bearer <token>" }
+Body: { "status": "SWAPPABLE" }
+Returns: { "id": "uuid", "title": "Meeting", "status": "SWAPPABLE", ... }
+```
+
+**Delete Event:**
+```bash
+DELETE /api/events/:id
+Headers: { "Authorization": "Bearer <token>" }
+Returns: { "message": "Event deleted successfully" }
+```
+
+**Browse Swappable Slots:**
+```bash
+GET /api/swappable-slots
+Headers: { "Authorization": "Bearer <token>" }
+Returns: [{ "id": "uuid", "title": "Slot", "startTime": "...", "endTime": "...", "status": "SWAPPABLE", "user": { "name": "Other User" } }]
+```
+
+**Create Swap Request:**
+```bash
+POST /api/swap-request
+Headers: { "Authorization": "Bearer <token>" }
+Body: { "mySlotId": "uuid", "theirSlotId": "uuid" }
+Returns: { "id": "uuid", "status": "PENDING", "requesterId": "uuid", "recipientId": "uuid", ... }
+```
+
+**Get Swap Requests:**
+```bash
+GET /api/swap-requests
+Headers: { "Authorization": "Bearer <token>" }
+Returns: { 
+  "incoming": [{ "id": "uuid", "status": "PENDING", "requester": {...}, "mySlot": {...}, "theirSlot": {...} }],
+  "outgoing": [{ "id": "uuid", "status": "PENDING", "recipient": {...}, "mySlot": {...}, "theirSlot": {...} }]
+}
+```
+
+**Accept/Reject Swap:**
+```bash
+POST /api/swap-response/:id
+Headers: { "Authorization": "Bearer <token>" }
+Body: { "accepted": true }
+Returns: { "message": "Swap request accepted", "swapRequest": {...} }
 ```
 
 ## 🌐 Live Deployment
