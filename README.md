@@ -18,10 +18,27 @@ A full-stack web application that allows users to create calendar events and swa
 
 ## 🚀 Local Setup Instructions
 
-### Prerequisites
-- Node.js 18+
-- PostgreSQL database
-- npm or yarn
+### Option 1: Using Docker (Recommended)
+
+**Prerequisites**: Docker Desktop
+
+```bash
+# Clone and start all services
+git clone https://github.com/Nitish151/serviceHire.git
+cd serviceHire
+docker compose up --build
+
+# Access the app
+# Frontend: http://localhost:3000
+# Backend: http://localhost:5000
+# Database: PostgreSQL on port 5432
+```
+
+Docker automatically sets up the database, runs migrations, and starts both frontend and backend services.
+
+### Option 2: Manual Setup
+
+**Prerequisites**: Node.js 18+, PostgreSQL, npm
 
 ### 1. Clone Repository
 ```bash
