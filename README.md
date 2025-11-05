@@ -26,7 +26,7 @@ Swap scheduled time slots (work shifts, appointments, meetings) with other users
 
 ```bash
 # Clone and start
-git clone 
+git clone https://github.com/Nitish151/serviceHire.git
 cd serviceHire
 docker compose up --build
 

@@ -1,22 +1,17 @@
-services:
-  # PostgreSQL Database
-  - type: pserv
-    name: slotswapper-db
-    env: docker
+databases:
+  - name: slotswapper-db
     plan: free
-    region: oregon
-    databases:
-      - name: slotswapper
-        user: postgres
+    databaseName: slotswapper
+    user: postgres
 
+services:
   # Backend API
   - type: web
     name: slotswapper-backend
-    env: node
-    region: oregon
+    runtime: node
     plan: free
-    buildCommand: npm install && npx prisma generate && npm run build
-    startCommand: npx prisma migrate deploy && npm start
+    buildCommand: cd backend && npm install && npx prisma generate && npm run build
+    startCommand: cd backend && npx prisma migrate deploy && npm start
     healthCheckPath: /api/health
     envVars:
       - key: DATABASE_URL
@@ -29,4 +24,3 @@ services:
         value: 5000
       - key: NODE_ENV
         value: production
-    rootDir: backend
