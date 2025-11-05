@@ -15,15 +15,19 @@ const HOST = process.env.HOST || '0.0.0.0';
 app.use(cors());
 app.use(express.json());
 
+// Health check endpoints (for monitoring/load balancers)
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok', message: 'SlotSwapper API is running' });
+});
+
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ status: 'ok', message: 'SlotSwapper API is running' });
+});
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api', swapRoutes);
-
-// Health check
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', message: 'SlotSwapper API is running' });
-});
 
 // Error handling middleware
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
