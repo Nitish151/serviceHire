@@ -1,83 +1,147 @@
 # SlotSwapper - Peer-to-Peer Time-Slot Scheduling
 
-A full-stack web application for swapping calendar time slots between users.
+A full-stack web application that allows users to create calendar events and swap time slots with other users through a marketplace system.
 
-## 🎯 What It Does
+## 🎯 Design Choices
 
-Swap scheduled time slots (work shifts, appointments, meetings) with other users through a marketplace system.
+- **Next.js 14 (App Router)**: Modern React framework with server components and improved routing
+- **Tailwind CSS**: Utility-first CSS for rapid UI development and consistent styling
+- **Prisma ORM**: Type-safe database client with excellent TypeScript integration
+- **JWT Authentication**: Stateless authentication for scalability
+- **Monorepo Structure**: Separate frontend/backend for independent deployment
 
 ## 🛠 Tech Stack
 
-- **Backend**: Node.js, Express, TypeScript, PostgreSQL, Prisma
-- **Frontend**: Next.js 14, React, TypeScript, Tailwind CSS
-- **DevOps**: Docker & Docker Compose
+**Frontend**: Next.js 14, React 18, TypeScript, Tailwind CSS, Axios  
+**Backend**: Node.js, Express, TypeScript, Prisma, PostgreSQL  
+**Deployment**: Vercel (Frontend), Render (Backend + DB)
 
-## ✨ Key Features
+## 🚀 Local Setup Instructions
 
-- JWT authentication
-- Event management (CRUD)
-- Swap marketplace
-- Request system with transaction safety
-- Responsive UI
+### Prerequisites
+- Node.js 18+
+- PostgreSQL database
+- npm or yarn
 
-## 🚀 Quick Start (Local)
-
-**Prerequisites**: Docker Desktop
-
+### 1. Clone Repository
 ```bash
-# Clone and start
 git clone https://github.com/Nitish151/serviceHire.git
 cd serviceHire
-docker compose up --build
-
-# Access at http://localhost:3000
 ```
 
-**Services**:
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:5000
-- Database: PostgreSQL on port 5432
+### 2. Backend Setup
+```bash
+cd backend
+npm install
 
-## 🌐 Deploy to Production
+# Create .env file
+echo 'DATABASE_URL="postgresql://user:password@localhost:5432/slotswapper"
+JWT_SECRET="your-secret-key"
+PORT=5000
+NODE_ENV=development' > .env
 
+# Setup database
+npx prisma generate
+npx prisma migrate dev
 
-## 📚 API Endpoints
+# Start server
+npm run dev
+```
+Backend runs on: `http://localhost:5000`
 
-**Base URL**: `http://localhost:5000/api`
+### 3. Frontend Setup
+```bash
+cd ../frontend
+npm install
 
-### Auth
-- `POST /auth/signup` - Register new user
-- `POST /auth/login` - User login
+# Create .env.local file
+echo 'NEXT_PUBLIC_API_URL=http://localhost:5000/api' > .env.local
 
-### Events (Protected)
-- `GET /events` - Get user's events
-- `POST /events` - Create event
-- `PUT /events/:id` - Update event
-- `DELETE /events/:id` - Delete event
+# Start frontend
+npm run dev
+```
+Frontend runs on: `http://localhost:3000`
 
-### Swaps (Protected)
-- `GET /swappable-slots` - Browse marketplace
-- `POST /swap-request` - Create swap request
-- `GET /swap-requests` - Get requests (incoming/outgoing)
-- `POST /swap-response/:requestId` - Accept/reject request
+## 📡 API Endpoints
 
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| POST | `/api/auth/signup` | Register user | ❌ |
+| POST | `/api/auth/login` | Login user | ❌ |
+| GET | `/api/events` | Get user's events | ✅ |
+| POST | `/api/events` | Create event | ✅ |
+| PUT | `/api/events/:id` | Update event | ✅ |
+| DELETE | `/api/events/:id` | Delete event | ✅ |
+| GET | `/api/swappable-slots` | Browse marketplace | ✅ |
+| POST | `/api/swap-request` | Request swap | ✅ |
+| GET | `/api/swap-requests` | Get all requests | ✅ |
+| POST | `/api/swap-response/:id` | Accept/reject swap | ✅ |
+
+### Example Requests
+
+**Signup:**
+```bash
+POST /api/auth/signup
+Body: { "name": "John", "email": "john@example.com", "password": "pass123" }
+Returns: { "token": "jwt-token", "user": {...} }
+```
+
+**Create Event:**
+```bash
+POST /api/events
+Headers: { "Authorization": "Bearer <token>" }
+Body: { "title": "Meeting", "startTime": "2025-11-10T10:00:00Z", "endTime": "2025-11-10T11:00:00Z", "status": "BUSY" }
+```
+
+## 🌐 Live Deployment
+
+- **Frontend**: https://service-hire.vercel.app
+- **Backend API**: https://slotswapper-backend-sx7f.onrender.com/api
+
+**⚠️ Testing Note**: To test swap functionality, open the app in **two different browsers** (e.g., Chrome and Firefox) and create two separate user accounts. Using the same browser with different tabs may cause authentication conflicts due to shared localStorage tokens.
+
+## 💭 Assumptions & Challenges
+
+### Assumptions
+- Users can only swap "SWAPPABLE" events (not BUSY ones)
+- One-to-one swaps (my slot for your slot)
+- Accepted swaps are permanent (no undo)
+- Each user manages their own calendar
+
+### Challenges Faced
+1. **Next.js Environment Variables**: `NEXT_PUBLIC_*` vars need special handling - used hardcoded fallback in `api.ts`
+2. **CORS in Production**: Required regex pattern to match Vercel preview deployments
+3. **Render Free Tier**: No shell access - used `prisma db push` instead of migrations
+4. **Auth Context Bug**: Was using raw `axios` instead of configured API instance, causing relative URL issues
 
 ## 📁 Project Structure
 
 ```
 serviceHire/
-├── backend/          # Express API, Prisma ORM
-├── frontend/         # Next.js 14, Tailwind CSS
-└── docker-compose.yml
+├── frontend/
+│   └── src/
+│       ├── app/         # Next.js pages (App Router)
+│       ├── components/  # Reusable UI components
+│       ├── context/     # Auth context provider
+│       └── utils/       # API client configuration
+├── backend/
+│   ├── src/
+│   │   ├── routes/      # Express route handlers
+│   │   ├── middleware/  # JWT auth middleware
+│   │   └── server.ts    # Express app setup
+│   └── prisma/
+│       └── schema.prisma # Database schema
+└── render.yaml          # Render deployment config
 ```
 
-## 🎨 Architecture Highlights
+## 🔒 Security
 
-- **Transaction Safety**: Prisma transactions ensure atomic swaps
-- **Protected Routes**: JWT authentication with route guards
-- **Type Safety**: Full TypeScript across stack
-- **Responsive Design**: Tailwind CSS utility classes
+- Passwords hashed with bcrypt (10 rounds)
+- JWT tokens with expiration
+- Protected API routes with middleware
+- CORS configured for specific origins
+- SQL injection prevention via Prisma
 
 ---
 
-Built with Next.js, Node.js, PostgreSQL & Docker
+Built with ❤️ using Next.js, Express, and PostgreSQL
