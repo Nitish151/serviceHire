@@ -3,6 +3,10 @@ const nextConfig = {
   reactStrictMode: true,
   // Use standalone output only for Docker builds (not Vercel)
   ...(process.env.DOCKER_BUILD === 'true' && { output: 'standalone' }),
+  // Log environment variables during build for debugging
+  env: {
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+  },
   async rewrites() {
     // Only use rewrites in development
     if (process.env.NODE_ENV === 'development') {
