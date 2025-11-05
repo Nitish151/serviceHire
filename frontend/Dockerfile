@@ -12,7 +12,8 @@ RUN npm install
 # Copy source code
 COPY . .
 
-# Build Next.js app
+# Build Next.js app with Docker flag
+ENV DOCKER_BUILD=true
 RUN npm run build
 
 # Production image
