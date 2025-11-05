@@ -11,8 +11,18 @@ const app = express();
 const PORT = parseInt(process.env.PORT || '5000', 10);
 const HOST = process.env.HOST || '0.0.0.0';
 
-// Middleware
-app.use(cors());
+// Middleware - CORS with specific origins
+app.use(cors({
+  origin: [
+    'http://localhost:3000',
+    'https://service-hire.vercel.app',
+    'https://service-hire-git-main-nitish-sharmas-projects-eb97a2a1.vercel.app',
+    /https:\/\/service-hire-.*\.vercel\.app$/ // Match all Vercel preview deployments
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 
 // Health check endpoints (for monitoring/load balancers)
